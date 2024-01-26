@@ -7,6 +7,7 @@
 
         <title> My booking page</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker-bs5.min.css">
         <style>
             .my-footer{
                 height: 3em;
@@ -75,24 +76,24 @@
 
               <form action="reservation.html" method="get" novalidate class="needs-validation">
 
-                <div class="row">
+                <div class="form-row">
 
                   <div class="col">
-                    <div class="mb-3">
-                      <label for="start-date" class="form-label">Starting date</label>
-                      <input required type="date" class="form-control" id="start-date" name="start-date" aria-describedby="start-dateHelp">
-                      <div id="start-dateHelp" class="form-text">Enter start date in the form DD-MM-YYYY.</div>
+
+                    <div class="row" id="reservation-dates">
+                      <div class="col">
+                        <input required class="form-control" type="text" name="start" placeholder="Arrival">
+                      </div>
+
+                      <div class="col">
+                        <input required class="form-control" type="text" name="end" placeholder="Departure" >  
+                      </div>
                     </div>
-                  </div>
-                  <div class="col">
-                    <div class="mb-3">
-                        <label for="end-date" class="form-label">ending date</label>
-                        <input required type="date" class="form-control" id="end-date" name="end-date" aria-describedby="end-dateHelp">
-                        <div id="end-dateHelp" class="form-text">Enter ending date in the form DD-MM-YYYY.</div>
-                    </div>
+
                   </div>
 
                 </div>
+                <hr>
 
                 <button type="submit" class="btn btn-primary">Search Availability</button>
               </form>
@@ -123,7 +124,7 @@
 
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
+        <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
         <script>
 
           console.log(" I am printing from javascript");
@@ -156,6 +157,11 @@
             myEl.classList.add("redtext");
             }
           })
+
+          const elem = document.getElementById('reservation-dates');
+          const rangepicker = new DateRangePicker(elem, {
+            // ...options
+          });
         </script>
     </body>
 </html>
