@@ -130,7 +130,7 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
 
-          console.log(" I am printing from javascript");
+          let attention = Prompt();
 
           // Example starter JavaScript for disabling form submissions if there are invalid fields
           (() => {
@@ -153,9 +153,26 @@
           })()
 
           document.getElementById("mybutton").addEventListener("click", function(){
-
-            notifyModal("title", "<em>Text message</em>", 'success', "confirmer" )
-            //notify('this is a message', 'success')
+            let html = `
+            <form id="check-availability-form" action="" method="post" novalidate class="needs-validation"> 
+              <div class="form-row">
+                <div class="col">
+                  <div class="form-row">
+                    <div class="col">
+                      <input required class="form-control" type="text" name="start" id="start" placeholder="Arrival"
+                    </div>
+                    <div class="col">
+                      <input required class="form-control" type="text" name="end" id="end" placeholder="Departure"
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+            `
+            
+            attention.custom({title: "Pick your date", msg: html})
+            // notifyModal("title", "<em>Text message</em>", 'success', "confirmer" )
+            // notify('this is a message', 'success')
           })
 
           const elem = document.getElementById('reservation-dates');
@@ -177,6 +194,91 @@
               icon: icon,
               confirmButtonText: confirmButton
             })
+          }
+
+          function Prompt(){
+            let toast = function (c){
+              const {
+                title= "",
+                icon= "success",
+                position= "top-end",
+              } = c;
+              const Toast = Swal.mixin({
+                toast: true,
+                title: title,
+                position: position,
+                icon: icon,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                  toast.onmouseenter = Swal.stopTimer;
+                  toast.onmouseleave = Swal.resumeTimer;
+                }
+              });
+              Toast.fire({});
+            }
+
+            let success = function (c){
+              const{
+                msg = "",
+                title = "",
+                footer = "",
+              } = c;
+              Swal.fire({
+                icon: "success",
+                title: title,
+                text: msg,
+                footer: footer,
+              });
+            }
+            let error = function (c){
+              const{
+                msg = "",
+                title = "",
+                footer = "",
+              } = c;
+              Swal.fire({
+                icon: "error",
+                title: title,
+                text: msg,
+                footer: footer,
+              });
+            }
+
+            async function custom (c) {
+              const {
+                msg = "",
+                title = "",
+              } = c;
+
+              const { value: formValues } = await Swal.fire({
+                title: title,
+                html:msg,
+                backdrop: false,
+                showCancelButton: true,
+                focusConfirm: false,
+                preConfirm: () => {
+                  return [
+                    document.getElementById("start").value,
+                    document.getElementById("end").value
+                  ];
+                }
+              });
+              if (formValues) {
+                Swal.fire(JSON.stringify(formValues));
+              }
+
+
+            }
+
+            return {
+              toast: toast,
+              success: success,
+              error: error,
+              custom: custom
+            }
+
           }
         </script>
     </body>
