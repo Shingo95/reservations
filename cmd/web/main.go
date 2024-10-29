@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/elorenzotti/bookings/pkg/config"
-	"github.com/elorenzotti/bookings/pkg/handlers"
-	"github.com/elorenzotti/bookings/pkg/render"
+	"github.com/elorenzotti/bookings/internal/config"
+	"github.com/elorenzotti/bookings/internal/handlers"
+	"github.com/elorenzotti/bookings/internal/render"
 )
 
 const portNumber = ":8080"
@@ -47,7 +47,7 @@ func main() {
 	// http.HandleFunc("/", handlers.Repo.Home)
 	// http.HandleFunc("/about", handlers.Repo.About)
 
-	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
+	fmt.Printf("Starting application on port %s", portNumber)
 	// _ = http.ListenAndServe(portNumber, nil)
 
 	srv := &http.Server{
