@@ -1,5 +1,7 @@
 package models
 
+import "github.com/elorenzotti/bookings/internal/forms"
+
 // TemplateData is the type of datas we are going to pass to the template
 
 type TemplateData struct {
@@ -11,4 +13,5 @@ type TemplateData struct {
 	Flash     string
 	Warning   string
 	Error     string
+	Form      *forms.Form
 }
