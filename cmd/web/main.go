@@ -28,7 +28,6 @@ func main() {
 	}
 
 	fmt.Printf("Starting application on port %s", portNumber)
-	// _ = http.ListenAndServe(portNumber, nil)
 
 	srv := &http.Server{
 		Addr:    portNumber,
@@ -36,7 +35,6 @@ func main() {
 	}
 	err = srv.ListenAndServe()
 
-	log.Println(err)
 	log.Fatal(err)
 
 }
