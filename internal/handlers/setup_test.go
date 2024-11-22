@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"text/template"
 	"time"
@@ -27,6 +28,12 @@ func getRoutes() http.Handler {
 
 	// what am I goin to put in my session
 	gob.Register(models.Reservation{})
+
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
 
 	// Change to true when in Production
 	app.InProduction = false
