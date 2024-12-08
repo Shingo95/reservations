@@ -1,6 +1,6 @@
 development:
   dialect: postgres
-  database: reservation
+  database: reservations
   user: manu
   password: 
   host: 127.0.0.1
