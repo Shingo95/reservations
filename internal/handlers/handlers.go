@@ -8,9 +8,12 @@ import (
 
 	"github.com/elorenzotti/bookings/helpers"
 	"github.com/elorenzotti/bookings/internal/config"
+	"github.com/elorenzotti/bookings/internal/driver"
 	"github.com/elorenzotti/bookings/internal/forms"
 	"github.com/elorenzotti/bookings/internal/models"
 	"github.com/elorenzotti/bookings/internal/render"
+	"github.com/elorenzotti/bookings/internal/repository"
+	"github.com/elorenzotti/bookings/internal/repository/dbrepo"
 )
 
 // Repo is the variable for the repository
@@ -19,13 +22,15 @@ var Repo *Repository
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // NewRepo creates a new repository
 
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 

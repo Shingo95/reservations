@@ -10,6 +10,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/elorenzotti/bookings/internal/config"
+	"github.com/elorenzotti/bookings/internal/driver"
 	"github.com/elorenzotti/bookings/internal/handlers"
 	"github.com/elorenzotti/bookings/internal/models"
 	"github.com/elorenzotti/bookings/internal/render"
@@ -25,11 +26,11 @@ var errorLog *log.Logger
 // main is the main application
 func main() {
 
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	defer db.SQL.Close()
 	fmt.Printf("Starting application on port %s", portNumber)
 
 	srv := &http.Server{
@@ -42,7 +43,7 @@ func main() {
 
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 	// what am I goin to put in my session
 	gob.Register(models.Reservation{})
 
@@ -63,21 +64,31 @@ func run() error {
 
 	app.Session = session
 
+	// connect to database
+	log.Println("Connecting to database")
+
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=reservations user=manu password=")
+	if err != nil {
+		log.Fatal("Cannot connect to database! Dying ...")
+	}
+
+	log.Println("Connected to database")
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return nil, err
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 
 	render.NewTemplates(&app)
 
 	// http.HandleFunc("/", handlers.Repo.Home)
 	// http.HandleFunc("/about", handlers.Repo.About)
-	return nil
+	return db, nil
 }
