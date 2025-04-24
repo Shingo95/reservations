@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/elorenzotti/bookings/helpers"
 	"github.com/elorenzotti/bookings/internal/config"
@@ -42,35 +44,35 @@ func NewHandlers(r *Repository) {
 // Home is the homepage handler
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
-	render.RenderTemplate(w, r, "home.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "home.page.tmpl", &models.TemplateData{})
 
 }
 
 // About is the about page handler
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	//Send the data to the template
-	render.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "about.page.tmpl", &models.TemplateData{})
 
 }
 
 // Bucolic is the bucolic-room page handler
 func (m *Repository) Bucolic(w http.ResponseWriter, r *http.Request) {
 	//Send the data to the template
-	render.RenderTemplate(w, r, "bucolic-room.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "bucolic-room.page.tmpl", &models.TemplateData{})
 
 }
 
 // London is the Old London Room page handler
 func (m *Repository) London(w http.ResponseWriter, r *http.Request) {
 	//Send the data to the template
-	render.RenderTemplate(w, r, "old-london.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "old-london.page.tmpl", &models.TemplateData{})
 
 }
 
 // Availability is the search-availibility page handler
 func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 	//Send the data to the template
-	render.RenderTemplate(w, r, "search-availability.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "search-availability.page.tmpl", &models.TemplateData{})
 
 }
 
@@ -102,14 +104,14 @@ func (m *Repository) AvailabilityJson(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(string(out))
-	w.Header().Set("Content-Type", "applciation/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
 }
 
 // Contact is the contact page handler
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 	//Send the data to the template
-	render.RenderTemplate(w, r, "contact.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "contact.page.tmpl", &models.TemplateData{})
 
 }
 
@@ -121,7 +123,7 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	data["reservation"] = emptyReservation
 
 	//Send the data to the template
-	render.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+	render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
 		Form: forms.New(nil),
 		Data: data,
 	})
@@ -136,11 +138,40 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		helpers.ServerError(w, err)
 		return
 	}
+
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
+
+	// 01-02-2024 -- 01/02 03:04:05PM '06 -0700
+	layout := "02/01/2006"
+	startDate, err := time.Parse(layout, sd)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	roomID, err := strconv.Atoi(r.Form.Get("room_id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	log.Printf("StartDate: %T\n", startDate)
+	log.Printf("EndDate: %T\n", endDate)
+	log.Printf("Room Id: %T\n", roomID)
+
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first-name"),
 		LastName:  r.Form.Get("last-name"),
 		Email:     r.Form.Get("email"),
 		Phone:     r.Form.Get("phone"),
+		StartDate: startDate,
+		EndDate:   endDate,
+		RoomID:    roomID,
 	}
 	form := forms.New(r.PostForm)
 
@@ -151,12 +182,32 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
-		render.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{
+		render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
 		return
 	}
+
+	newReservationId, err := m.DB.InsertReservation(reservation)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	newRestriction := models.RoomRestriction{
+		StartDate:     startDate,
+		EndDate:       endDate,
+		RoomID:        roomID,
+		ReservationID: newReservationId,
+		RestrictionID: 1,
+	}
+	err = m.DB.InsertRestrictions(newRestriction)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }
@@ -174,7 +225,7 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
 
-	render.RenderTemplate(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
+	render.Template(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
 }

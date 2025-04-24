@@ -26,29 +26,36 @@
                        autocomplete="off">
                     </div>
                     <div class="form-group">
-
                       <label for="last-name">Last Name</label>
                       {{with .Form.Errors.Get "last-name"}}
                         <label class="text-danger">{{.}}</label>
-
                       {{end}}
                       <input required value="{{$res.LastName}}" type="text" name="last-name" id="last-name" class="form-control {{with .Form.Errors.Get "last-name"}} is-invalid {{end}}" required autocomplete="off">
                     </div>
 
                     <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="text" name="start_date" id="start_date" class="form-control">  
+                    </div>
 
-                      <label for="email">Email address</label>
-                      
+                    <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="text" name="end_date" id="end_date" class="form-control">  
+                    </div>
+                    
+                    <input type="hidden" name="room_id" value=2>
+
+                    <div class="form-group">
+                      <label for="email">Email address</label>        
                       {{with .Form.Errors.Get "email"}}
                         <label class="text-danger">{{.}}</label>
 
                       {{end}}
                       <input required value="{{$res.Email}}" type="text" name="email" id="email" class="form-control {{with .Form.Errors.Get "email"}} is-invalid {{end}}" required autocomplete="off">
                     </div>
-                    <div class="form-group">
 
+                    <div class="form-group">
                       <label for="phone">Phone number</label>
-                      
                       {{with .Form.Errors.Get "phone"}}
                         <label class="text-danger">{{.}}</label>
 

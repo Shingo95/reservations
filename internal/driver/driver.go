@@ -21,6 +21,7 @@ const maxIdleDbConn = 5
 const maxDbLifetime = 5 * time.Minute
 
 // ConnectSQL create a connection pool
+
 func ConnectSQL(dsn string) (*DB, error) {
 	d, err := NewDatabase(dsn)
 	if err != nil {
